@@ -28,7 +28,7 @@ public class SecurityConfig {
                         request
                                 .requestMatchers("/auth/register").permitAll()
                                 .requestMatchers("/auth/login").permitAll()
-                                .requestMatchers("/auth/logout").hasAnyAuthority(Roles.ADMIN.toString(), Roles.USER.toString())
+                                .requestMatchers("/auth/logout").permitAll()
                                 .requestMatchers("/auth/verify-token").hasAnyAuthority(Roles.ADMIN.toString(), Roles.USER.toString())
                                 .requestMatchers("/user/me").hasAuthority(Roles.USER.toString())
                                 .anyRequest().authenticated())

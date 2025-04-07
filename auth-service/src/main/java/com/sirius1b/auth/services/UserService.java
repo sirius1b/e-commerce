@@ -1,10 +1,7 @@
 package com.sirius1b.auth.services;
 
 import com.sirius1b.auth.configs.SecurityJwtConfig;
-import com.sirius1b.auth.exceptions.CredentialException;
-import com.sirius1b.auth.exceptions.RoleNotFoundException;
-import com.sirius1b.auth.exceptions.TokenNotFoundException;
-import com.sirius1b.auth.exceptions.UserNotFoundException;
+import com.sirius1b.auth.exceptions.*;
 import com.sirius1b.auth.models.Role;
 import com.sirius1b.auth.models.Token;
 import com.sirius1b.auth.models.User;
@@ -13,10 +10,14 @@ import com.sirius1b.auth.repos.TokenRepository;
 import com.sirius1b.auth.repos.UserRepository;
 import com.sirius1b.auth.utils.Roles;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -30,6 +31,8 @@ public class UserService {
     private JwtService jwtService;
     private RoleRepository roleRepository;
 
+    private TokenCacheService tokenCacheService;
+
     @Autowired
     private SecurityJwtConfig jwtConfig;
 
@@ -37,19 +40,23 @@ public class UserService {
                        TokenRepository tokenRepository,
                        BCryptPasswordEncoder encoder,
                        JwtService jwtService,
-                       RoleRepository roleRepository){
+                       RoleRepository roleRepository,
+                       TokenCacheService redisService){
         this.userRepository = userRepository;
         this.tokenRepository = tokenRepository;
         this.encoder = encoder;
         this.jwtService = jwtService;
         this.roleRepository = roleRepository;
-
+        this.tokenCacheService = redisService;
     }
 
     public User register(String name,
                          String email,
-                         String password) throws RoleNotFoundException {
+                         String password) throws RoleNotFoundException, UserExistsException {
 
+        if (! userRepository.findByEmail(email).isEmpty()){
+            throw new UserExistsException("DUPLICATE EMAIL!");
+        }
         User user = new User();
         user.setEmail(email);
         user.setName(name);
@@ -63,7 +70,7 @@ public class UserService {
 
         user.setRoles(Collections.singletonList(userRole));
 
-         return userRepository.save(user);
+        return userRepository.save(user);
     }
 
     public Token login(String email, String password) throws UserNotFoundException, CredentialException {
@@ -79,20 +86,24 @@ public class UserService {
         }
 
         Token token = getUserToken(user);
-        tokenRepository.save(token);
+
+//        tokenRepository.save(token);
+
+        tokenCacheService.saveToken(token.getValue(), token.getExpiryAt());
         return token;
     }
 
     public void logout (String value) throws TokenNotFoundException {
         // TODO: update this for redis removal
+//        redisService.delete();
+//        Token token = tokenRepository.findByValue(value).orElse(null);
+//
+//        if (token == null){
+//            throw new TokenNotFoundException("Token Not Found");
+//        }
+//        tokenRepository.delete(token);
 
-        Token token = tokenRepository.findByValue(value).orElse(null);
-
-        if (token == null){
-            throw new TokenNotFoundException("Token Not Found");
-        }
-
-        tokenRepository.delete(token);
+        tokenCacheService.deleteToken(value);
     }
 
     private Token getUserToken(User user){
@@ -101,5 +112,16 @@ public class UserService {
         token.setUser(user);
         token.setValue(jwtService.generateToken(user));
         return token;
+    }
+
+    public List<String> verifyToken(String token) throws TokenNotFoundException {
+        if (tokenCacheService.isMember(token)){
+            Collection<GrantedAuthority> grantedAuthorities = jwtService.extractAuthorities(token);
+            return grantedAuthorities
+                    .stream()
+                    .map(e -> e.toString())
+                    .collect(Collectors.toList());
+        }
+        throw new TokenNotFoundException("NOT FOUND TOKEN");
     }
 }

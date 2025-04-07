@@ -2,10 +2,7 @@ package com.sirius1b.auth.controllers;
 
 
 import com.sirius1b.auth.dtos.*;
-import com.sirius1b.auth.exceptions.CredentialException;
-import com.sirius1b.auth.exceptions.RoleNotFoundException;
-import com.sirius1b.auth.exceptions.TokenNotFoundException;
-import com.sirius1b.auth.exceptions.UserNotFoundException;
+import com.sirius1b.auth.exceptions.*;
 import com.sirius1b.auth.models.Token;
 import com.sirius1b.auth.models.User;
 import com.sirius1b.auth.services.UserService;
@@ -14,6 +11,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/auth")
@@ -27,7 +26,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public RegisterRespDto signup(@RequestBody RegisterDto request) throws RoleNotFoundException {
+    public RegisterRespDto signup(@RequestBody RegisterDto request) throws RoleNotFoundException, UserExistsException {
         log.info(request.toString());
         User user =  userService.register( request.getName(),
                                     request.getEmail(),
@@ -51,12 +50,9 @@ public class AuthController {
 
 
     @PostMapping("/verify-token")
-    public TokenRespDto verify(@RequestBody TokenDto req) {
-        /* TODO: verify jwt existence in redis
-                if does, extract claims from it,
-                 and return in the response
-         */
-        return null;
+    public VerifyDto verify(@RequestBody TokenDto req) throws TokenNotFoundException {
+        List<String> roles = userService.verifyToken(req.getToken());
+        return VerifyDto.from(req.getToken(), roles);
     }
 
 

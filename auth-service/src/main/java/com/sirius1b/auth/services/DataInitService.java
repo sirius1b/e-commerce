@@ -17,7 +17,7 @@ import java.util.List;
 
 @Service
 public class DataInitService {
-
+    // TODO: remove this
     private static final String ADMIN_USERNAME = "adminuser";
     private static final String ADMIN_PASSWORD = "adminpasswor";
     private static final String ADMIN_EMIAL = "admin@admin.com";

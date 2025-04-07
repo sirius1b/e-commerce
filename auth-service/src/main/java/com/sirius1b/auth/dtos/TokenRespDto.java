@@ -12,8 +12,6 @@ public class TokenRespDto {
     private String token;
     private Date expiryAt;
 
-    // TODO: add claims info, user/admin for service to see
-
     public static TokenRespDto from(Token token){
         TokenRespDto tokenRespDto = new TokenRespDto();
         tokenRespDto.setToken(token.getValue());

@@ -25,4 +25,10 @@ public class ExceptionHandler {
         ExceptionDto exceptionDto = new ExceptionDto(e.getMessage(), e.getCode());
         return new ResponseEntity<ExceptionDto>(exceptionDto, HttpStatus.NOT_FOUND);
     }
+
+    @org.springframework.web.bind.annotation.ExceptionHandler(UserExistsException.class)
+    public ResponseEntity<ExceptionDto> handleDuplicateUser(UserExistsException e){
+        ExceptionDto exceptionDto = new ExceptionDto(e.getMessage(), e.getCode());
+        return new ResponseEntity<ExceptionDto>(exceptionDto, HttpStatus.NOT_FOUND);
+    }
 }
