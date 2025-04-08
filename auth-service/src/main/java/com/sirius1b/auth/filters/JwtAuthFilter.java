@@ -1,6 +1,7 @@
 package com.sirius1b.auth.filters;
 
 import com.sirius1b.auth.services.JwtService;
+import com.sirius1b.auth.services.TokenCacheService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,6 +26,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     @Autowired
     private UserDetailsService userDetailsService;
 
+    @Autowired
+    private TokenCacheService cacheService;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
@@ -38,11 +42,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
 
         jwt = authHeader.substring(7);
+        logger.info("--/" + jwt + "--");
         username = jwtService.extractUsername(jwt); // this is email :)
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-            if (jwtService.isTokenValid(jwt)) {
+            if (jwtService.isTokenValid(jwt) && cacheService.isMember(jwt)) {
 
                 var authToken = new UsernamePasswordAuthenticationToken(
                         username, null, jwtService.extractAuthorities(jwt));
@@ -51,6 +56,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
+
+
         }
 
         filterChain.doFilter(request, response);

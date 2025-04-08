@@ -7,10 +7,7 @@ import com.sirius1b.auth.models.Token;
 import com.sirius1b.auth.models.User;
 import com.sirius1b.auth.services.UserService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -50,9 +47,10 @@ public class AuthController {
 
 
     @PostMapping("/verify-token")
-    public VerifyDto verify(@RequestBody TokenDto req) throws TokenNotFoundException {
-        List<String> roles = userService.verifyToken(req.getToken());
-        return VerifyDto.from(req.getToken(), roles);
+    public VerifyDto verify(@RequestHeader("Authorization") String token) throws TokenNotFoundException {
+        token = token.substring(7);
+        List<String> roles = userService.extractRoles(token);
+        return VerifyDto.from(token, roles);
     }
 
 

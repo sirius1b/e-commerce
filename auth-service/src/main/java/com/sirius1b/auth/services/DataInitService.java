@@ -1,9 +1,9 @@
 package com.sirius1b.auth.services;
 
+import com.sirius1b.auth.configs.SecureAdminConfig;
 import com.sirius1b.auth.models.Role;
 import com.sirius1b.auth.models.User;
 import com.sirius1b.auth.repos.RoleRepository;
-import com.sirius1b.auth.repos.TokenRepository;
 import com.sirius1b.auth.repos.UserRepository;
 import com.sirius1b.auth.utils.Roles;
 import jakarta.annotation.PostConstruct;
@@ -12,15 +12,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
 import java.util.List;
 
 @Service
 public class DataInitService {
-    // TODO: remove this
-    private static final String ADMIN_USERNAME = "adminuser";
-    private static final String ADMIN_PASSWORD = "adminpasswor";
-    private static final String ADMIN_EMIAL = "admin@admin.com";
 
     @Autowired
     private RoleRepository roleRepository;
@@ -30,6 +25,9 @@ public class DataInitService {
 
     @Autowired
     private BCryptPasswordEncoder encoder;
+
+    @Autowired
+    private SecureAdminConfig adminConfig;
 
     @PostConstruct
     @Transactional
@@ -43,12 +41,12 @@ public class DataInitService {
         }
 
         User admin = new User();
-        admin.setName(ADMIN_USERNAME);
+        admin.setName(adminConfig.username());
         admin.setRoles(List.of(roleRepository.findByValue(Roles.ADMIN.toString()).get()));
-        admin.setEmail(ADMIN_EMIAL);
-        admin.setHashedPassword(encoder.encode(ADMIN_PASSWORD));
+        admin.setEmail(adminConfig.email());
+        admin.setHashedPassword(encoder.encode(adminConfig.password()));
 
-        if (userRepository.findByEmail(ADMIN_EMIAL).isEmpty())
+        if (userRepository.findByEmail(adminConfig.email()).isEmpty())
             userRepository.save(admin);
     }
 
