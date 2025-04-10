@@ -40,7 +40,6 @@ services:
     depends_on:
       - zookeeper
 
-
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
     container_name: kafka-ui
@@ -51,24 +50,25 @@ services:
     environment:
       KAFKA_CLUSTERS_0_NAME: local
       KAFKA_CLUSTERS_0_BOOTSTRAP_SERVERS: kafka:9092
-#  elasticsearch:
-#    image: docker.elastic.co/elasticsearch/elasticsearch:8.10.0 # Or specify your desired version
-#    container_name: elasticsearch
-#    environment:
-#      - discovery.type=single-node
-#      - "ES_JAVA_OPTS=-Xms512m -Xmx512m" # Adjust memory limits as needed
-#      - "xpack.security.enabled=false" # Disable security for development (NOT RECOMMENDED FOR PRODUCTION)
-#    ports:
-#      - "9200:9200"
-#      - "9300:9300"
-#    volumes:
-#      - esdata1:/usr/share/elasticsearch/data
-#    healthcheck:
-#      test: curl --fail http://localhost:9200
-#      interval: 30s
-#      timeout: 10s
-#      retries: 3
-#    restart: always
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.10.0 # Or specify your desired version
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m" # Adjust memory limits as needed
+      - "xpack.security.enabled=false" # Disable security for development (NOT RECOMMENDED FOR PRODUCTION)
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      - esdata1:/usr/share/elasticsearch/data
+    healthcheck:
+      test: curl --fail http://localhost:9200
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: always
 
 
 volumes:
@@ -77,6 +77,6 @@ volumes:
   kafka_data:
     driver: local
   zookeeper_data:
-
-#  esdata1:
-#    driver: local
+    driver: local
+  esdata1:
+    driver: local

@@ -2,10 +2,9 @@ package com.sirius1b.product.controllers;
 
 
 import com.sirius1b.product.dtos.ProductDto;
-import com.sirius1b.product.models.Product;
-import com.sirius1b.product.services.KafkaProducerService;
+import com.sirius1b.product.services.IndexerService;
+import com.sirius1b.product.services.EventProducerService;
 import com.sirius1b.product.services.ProductService;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,34 +19,34 @@ import java.util.UUID;
 @Slf4j
 public class ProductController {
 
-
     @Autowired
     private ProductService productService;
 
     @Autowired
-    private KafkaProducerService producerService;
+    private EventProducerService producerService;
+
+    @Autowired
+    private IndexerService indexerService;
 
     @GetMapping
-    public ResponseEntity<List<Product>> getAllProducts() {
-        List<Product> products = productService.getAllProducts();
-        // TODO: read from es
+    public ResponseEntity<List<ProductDto>> getAllProducts() {
+        List<ProductDto> products = indexerService.getAllProducts();
         return ResponseEntity.ok(products);
     }
 
     @PostMapping
-    public ResponseEntity<Product> createProduct(@RequestBody ProductDto productDto) {
-//        Product savedProduct = productService.createProduct(productDto);
-        producerService.productUpdate(productDto.toString());
-        // TODO: push update to kafka for es
-        return ResponseEntity.status(HttpStatus.CREATED).body(null);
+    public ResponseEntity<ProductDto> createProduct(@RequestBody ProductDto productDto) {
+        ProductDto savedProduct = productService.createProduct(productDto);
+        producerService.productUpdate(savedProduct.toString());
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedProduct);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Product> updateProduct(@PathVariable UUID id, @RequestBody ProductDto productDto) {
+    public ResponseEntity<ProductDto> updateProduct(@PathVariable String id, @RequestBody ProductDto productDto) {
         productDto.setId(id); // Ensure the ID from the path is used
-        Product updatedProduct = productService.updateProduct(productDto);
-        // TODO: push update to kafka for es
+        ProductDto updatedProduct = productService.updateProduct(productDto);
         if (updatedProduct != null) {
+            producerService.productUpdate(updatedProduct.toString());
             return ResponseEntity.ok(updatedProduct);
         } else {
             return ResponseEntity.notFound().build();
@@ -55,19 +54,23 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Product> getProductById(@PathVariable UUID id) {
-        Product product = productService.getProductById(id);
+    public ResponseEntity<ProductDto> getProductById(@PathVariable String id) {
+        ProductDto product = indexerService.getProductById(id);
         if (product != null) {
             return ResponseEntity.ok(product);
         } else {
+            product = productService.getProductById(id);
+            if (product != null){
+                return ResponseEntity.ok(product);
+            }
             return ResponseEntity.notFound().build();
         }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProductById(@PathVariable UUID id) {
+    public ResponseEntity<Void> deleteProductById(@PathVariable String id) {
         productService.deleteProductById(id);
-        // TODO: update for es as well
+        producerService.productDelete(id.toString());
         return ResponseEntity.noContent().build();
     }
 }

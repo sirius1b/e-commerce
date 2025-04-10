@@ -1,13 +1,12 @@
 package com.sirius1b.product.services;
 
-import com.sirius1b.product.Constants;
+import com.sirius1b.product.common.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
-public class KafkaProducerService {
+public class EventProducerService {
 
 
     @Autowired
@@ -17,7 +16,7 @@ public class KafkaProducerService {
         kafkaTemplate.send(Constants.TOPIC_PRODUCT_UPDATE, message);
     }
 
-    public void proudctDelete(String message){
+    public void productDelete(String message){
         kafkaTemplate.send(Constants.TOPIC_PRODUCT_DELETE, message);
     }
 }
