@@ -3,7 +3,6 @@ package com.sirius1b.product.dtos;
 
 import com.sirius1b.product.models.mongo.Category;
 import lombok.Data;
-import java.util.UUID;
 
 @Data
 public class CategoryDto {
@@ -19,11 +18,5 @@ public class CategoryDto {
         return categoryDto;
     }
 
-    public static CategoryDto fromE (com.sirius1b.product.models.elasticsearch.Category category){
-        CategoryDto categoryDto = new CategoryDto();
-        categoryDto.setId(category.getId());
-        categoryDto.setName(category.getName());
-        categoryDto.setDescription(category.getDescription());
-        return categoryDto;
-    }
+
 }

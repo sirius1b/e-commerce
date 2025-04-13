@@ -1,15 +1,18 @@
 package com.sirius1b.product.services;
 
+import com.sirius1b.product.dtos.CategoryDto;
 import com.sirius1b.product.dtos.ProductDto;
+import com.sirius1b.product.models.mongo.Category;
 import com.sirius1b.product.models.mongo.Product;
 import com.sirius1b.product.repos.mongo.ProductMRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
+
 
 @Service
 public class ProductService {
@@ -17,15 +20,20 @@ public class ProductService {
     @Autowired
     private ProductMRepository productRepository;
 
-    public List<Product> getAllProducts() {
-        return productRepository.findAll();
+    public List<ProductDto> getAllProducts() {
+        return productRepository.findAll().stream().map(ProductDto::from).toList();
+    }
+
+    public List<CategoryDto> getCategories() {
+        List<Category> categories = new ArrayList<>();
+        productRepository.findAll().forEach(p -> categories.addAll(p.getCategories()));
+        return categories.stream().map(CategoryDto::from).toList();
     }
 
     public ProductDto createProduct(ProductDto productDto) {
         Product product = Product.from(productDto);
         product.setCreatedAt(LocalDateTime.now());
         product.setUpdatedAt(LocalDateTime.now());
-        product.setId(UUID.randomUUID().toString());
         return ProductDto.from(productRepository.save(product));
     }
 
@@ -50,5 +58,6 @@ public class ProductService {
     public void deleteProductById(String id){
         productRepository.deleteById(id);
     }
+
 
 }

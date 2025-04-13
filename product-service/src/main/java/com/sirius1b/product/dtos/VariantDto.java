@@ -25,14 +25,6 @@ public class VariantDto {
         return variantDto;
     }
 
-    public static VariantDto fromE (com.sirius1b.product.models.elasticsearch.Variant variant){
-        VariantDto variantDto = new VariantDto();
-        variantDto.setId(variant.getId());
-        variantDto.setSku(variant.getSku());
-        variantDto.setAttributes(variant.getAttributes());
-        variantDto.setPrice(variant.getPrice());
-        variantDto.setStock(variant.getStock());
-        return variantDto;
-    }
+
 }
 

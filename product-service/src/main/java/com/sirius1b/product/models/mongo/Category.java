@@ -20,6 +20,7 @@ public class Category {
     public static Category from(CategoryDto dto){
         Category category = new Category();
         category.setName(dto.getName());
+        category.setId(category.name);
         category.setDescription(dto.getDescription());
         return category;
     }
