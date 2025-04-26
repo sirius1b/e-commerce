@@ -1,0 +1,55 @@
+actor User
+participant "Client Application" as Client
+participant "Order Service" as OrderSvc
+database "Order Database" as OrderDB
+participant "Payment Service" as PaymentSvc
+participant "Notification Service" as NotificationSvc
+actor Admin
+
+== Create Order (from checkout) ==
+User -> Client: Completes Checkout
+Client -> OrderSvc: POST /orders (order details, user ID)
+OrderSvc -> OrderDB: Save new order
+OrderDB --> OrderSvc: Order ID
+OrderSvc -> PaymentSvc:  Verify Payment
+PaymentSvc --> OrderSvc: Payment Status
+alt Payment successful
+    OrderSvc -> OrderDB: Update order status (e.g., "processing")
+    OrderDB --> OrderSvc: OK
+    OrderSvc -> NotificationSvc: Notify user (order confirmation)
+    NotificationSvc --> OrderSvc: OK
+    OrderSvc --> Client: Order confirmation (Order ID)
+    Client <-- User: Order confirmation
+else Payment failed
+     OrderSvc -> OrderDB: Update order status (e.g., "payment_failed")
+    OrderDB --> OrderSvc: OK
+    OrderSvc --> Client: Order failed
+    Client <-- User: Order failed
+end
+
+== List User's Orders ==
+User -> Client: Requests Order History
+Client -> OrderSvc: GET /orders (user ID)
+OrderSvc -> OrderDB: Retrieve orders for user
+OrderDB --> OrderSvc: List of orders
+OrderSvc --> Client: List of orders
+Client <-- User: Order history displayed
+
+== Order Details ==
+User -> Client: Requests Order Details (by ID)
+Client -> OrderSvc: GET /orders/{id}
+OrderSvc -> OrderDB: Retrieve order by ID
+OrderDB --> OrderSvc: Order details
+OrderSvc --> Client: Order details
+Client <-- User: Order details displayed
+
+== Update Order Status (Admin) ==
+Admin -> Client: Initiates Status Update
+Client -> OrderSvc: PUT /orders/{id}/status (new status)
+OrderSvc -> OrderDB: Update order status (new status)
+OrderDB --> OrderSvc: OK
+OrderSvc -> NotificationSvc: Notify user (status update)
+NotificationSvc --> OrderSvc: OK
+OrderSvc --> Client: Status updated
+Client <-- Admin: Status updated
+@enduml

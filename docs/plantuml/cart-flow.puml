@@ -1,0 +1,79 @@
+@startuml
+actor User
+participant "Client Application" as Client
+participant "Cart Service" as CartSvc
+database "Cart Database" as CartDB
+participant "Authentication Service" as AuthService
+participant "Product Service" as ProductSvc
+
+box "Internal Interface" #LightBlue
+    participant "Inventory Service" as Inventory
+end box
+
+== Get Current Cart ==
+User -> Client: Requests Current Cart (with JWT)
+Client -> CartSvc: GET /cart (JWT)
+CartSvc -> AuthService: GET /users/me (JWT)
+AuthService --> CartSvc: User ID
+CartSvc -> CartDB: Retrieve cart for User ID
+CartDB --> CartSvc: Cart data
+CartSvc --> Client: Cart data
+Client <-- User: Displays current cart
+
+== Add Item to Cart ==
+User -> Client: Adds Item to Cart (product ID, quantity, JWT)
+Client -> CartSvc: POST /cart/add (product ID, quantity, JWT)
+CartSvc -> AuthService: GET /users/me (JWT)
+AuthService --> CartSvc: User ID
+CartSvc -> ProductSvc: Get product details (product ID)
+ProductSvc --> CartSvc: Product details (name, price, stock)
+alt Stock is sufficient
+    CartSvc -> CartDB: Add/update item in cart for User ID
+    CartDB --> CartSvc: Cart updated
+    CartSvc --> Client: Cart updated
+    Client <-- User: Cart updated confirmation
+else Stock is insufficient
+    CartSvc --> Client: Insufficient stock
+    Client <-- User: Insufficient stock message
+end
+
+== Remove Item from Cart ==
+User -> Client: Removes Item from Cart (item ID, JWT)
+Client -> CartSvc: POST /cart/remove (item ID, JWT)
+CartSvc -> AuthService: GET /users/me (JWT)
+AuthService --> CartSvc: User ID
+CartSvc -> CartDB: Remove item from cart for User ID
+CartDB --> CartSvc: Cart updated
+CartSvc --> Client: Cart updated
+Client <-- User: Cart updated confirmation
+
+== Initiate Checkout ==
+User -> Client: Initiates Checkout (JWT)
+Client -> CartSvc: POST /cart/checkout (JWT)
+CartSvc -> AuthService: GET /users/me (JWT)
+AuthService --> CartSvc: User ID
+CartSvc -> CartDB: Retrieve cart for User ID
+CartDB --> CartSvc: Cart data with item IDs and quantities
+CartSvc -> ProductSvc: Get product details for all items
+ProductSvc --> CartSvc: List of product details (name, price, stock)
+CartSvc -> CartSvc: Calculate total price (cart items with quantities and prices)
+CartSvc -> Inventory: Lock stock (cart items with quantities)
+Inventory --> CartSvc: Stock lock status (Success/Failure)
+alt Stock lock successful
+    CartSvc -> OrderSvc: POST /orders (order details, user ID)
+    alt Order Confirmed
+
+
+    CartSvc --> Client: Checkout confirmed
+    else not confirmed
+    CartSvc --> Client: Checkout failed (stock unavailable)
+
+
+end
+
+else Stock lock failed
+    CartSvc --> Client: Checkout failed (stock unavailable)
+    Client <-- User: Stock unavailable message
+end
+
+@enduml
