@@ -42,7 +42,7 @@ InventorySvc --> Client: Stock quantity
 == Update Stock (Admin) ==
 
 Admin -> InventorySvc: PUT /inventory/stock/{product_id} (new_quantity)
-InventorySvc-> AuthService: POST /auth/has-authority (JWT, "ADMIN")
+InventorySvc-> AuthService: POST /auth/verify-token (JWT, "ADMIN")
 alt Has authority
 InventorySvc -> InventoryDB: Update stock for product_id (new_quantity)
 InventoryDB --> InventorySvc: OK
