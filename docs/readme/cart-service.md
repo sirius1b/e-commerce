@@ -7,7 +7,20 @@ Handles user carts and checkout session.
 - `POST /cart/remove` – Remove item from cart
 - `POST /cart/checkout` – Initiate checkout
 
-Note:
+**Authentication:**
 
-- each api is user level, extract user_id from it from auth-service for that token by users/me api and use it cart api flow
-- there is will no priciing engine, pricing information will be stored in product-service,
+- All endpoints require authentication via a user token.
+- The `user_id` is extracted from the token using the `auth-service`'s `/users/me` endpoint.
+- This `user_id` is used to associate the cart with the correct user.
+
+**Data Flow:**
+
+- This service does not handle pricing. Pricing information is managed by the `product-service`.
+- The cart only stores product IDs and quantities.
+
+**Checkout Flow:**
+
+- The `POST /cart/checkout` endpoint initiates the checkout process.
+- The service interacts with other services (e.g., payment service, order service - _to be defined_) to complete the checkout.
+
+![](../images/cart-flow.svg)

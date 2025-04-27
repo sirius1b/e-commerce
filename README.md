@@ -18,7 +18,7 @@ Super Repo for E-Commerce Backend Project
 
 ### Port
 
-** Services **
+**Services**
 
 - Auth: 8080
 - Product: 8081
@@ -28,56 +28,15 @@ Super Repo for E-Commerce Backend Project
 - Inventory: 8085
 - Payment: 8086
 
-** Systems **
+### Design
 
-- Redis: 6379
-- Mysql: 3306
-- Mongo: 27017
+- [**Overview Docs**](./docs/readme/flows.md)
+- [Authentication Service](./docs/readme/auth-service.md)
+- [Product Service](./docs/readme/product-service.md)
+- [Order Service](./docs/readme/order-service.md)
+- [Cart Service](./docs/readme/cart-service.md)
+- [Inventory Service](./docs/readme/inventory-service.md)
+- [Notification Service](./docs/readme/notification-service.md)
+- [Payment Service](./docs/readme/payment-service.md)
 
-- to implement:
-
-  - auth
-
-    - [x] registration
-    - [x] login
-    - [x] logout
-    - [x] get user profile
-    - [x] update user profile
-    - [x] verify token with optional Role
-
-  - products
-
-    - [x] get product(id,ids)
-    - [x] list product
-    - [x] post proudct
-    - [x] update product
-    - [x] delete product
-    - [x] list categories
-
-  - cart
-
-    - [ ] get cart
-    - [ ] add item to cart
-    - [ ] remove cart
-    - [ ] do checkout
-
-  - order
-
-    - [ ] post order
-    - [ ] list orders
-    - [ ] get order details (id)
-    - [ ] update order status
-
-  - notification
-
-    - [ ] notify user(user_id, event)
-
-  - inventory
-    - [ ] lock-stock
-    - [ ] unlock-stock
-    - [ ] get stock (product_id)
-    - [ ] update stock (product_id)
-
-- to mock:
-  - payment
-    - [ ] make payment: random, hook towards order api, to update order status
+Progress [here](./todos.md)

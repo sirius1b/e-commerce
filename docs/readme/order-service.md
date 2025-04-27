@@ -1,14 +1,15 @@
-Processes orders post-checkout.
+Handles payment processing.
 
 **Endpoints:**
 
-- `POST /orders` – Create order (from checkout)
-- `GET /orders` – List user’s orders
-- `GET /orders/{id}` – Order details
-- `PUT /orders/{id}/status` – Update status (admin)
+- `POST /payments` – Process a payment
+- `GET /payments/{id}` – Payment details
 
 **Internal interface:**
 
-- Save new order
-- Update status (e.g., paid, shipped)
-- Notify user (event)
+- Charge user
+- Record transaction
+- Verify transaction
+- Notify order service (event)
+
+![](../images/order-flow.svg)
