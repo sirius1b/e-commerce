@@ -2,7 +2,7 @@
 
 Super Repo for E-Commerce Backend Project
 
-Tech Stack
+#### Tech Stack
 
 | svc          | tech stack                     |
 | ------------ | ------------------------------ |
@@ -16,18 +16,34 @@ Tech Stack
 
 ---
 
+### Port
+
+** Services ** 
+- Auth: 8080
+- Product: 8081
+- Cart: 8082 
+- Order: 8083
+- Notification: 8084
+- Inventory: 8085
+- Payment: 8086
+
+** Systems ** 
+- Redis: 6379
+- Mysql: 3306
+- Mongo: 27017
+
+
 - to implement:
 
   - auth
 
-    - [ ] registration
-    - [ ] login
-    - [ ] logout
-    - [ ] get user profile
-    - [ ] update user profile
-    - [ ] verify token
-    - [ ] has authority -> implemented in verity-token
-
+    - [x] registration
+    - [x] login
+    - [x] logout
+    - [x] get user profile
+    - [x] update user profile
+    - [x] verify token with optional Role
+  
   - products
 
     - [ ]get product(id,ids)

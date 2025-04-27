@@ -102,8 +102,8 @@ else JWT is invalid or expired
 end
 
 
-== Internal Has Authority Check ==
-OtherSvc -> AuthService: POST /auth/has-authority (JWT, authority)
+== Internal Has Authority Check(Verify Token) ==
+OtherSvc -> AuthService: POST  /auth/verify-token (JWT, authority)
 AuthService -> AuthService: Validates JWT (internally)
 alt JWT is valid
     AuthService -> Redis: GET user ID by JWT

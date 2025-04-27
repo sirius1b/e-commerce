@@ -31,7 +31,7 @@ end
 == Add a Product (Admin) ==
 Admin -> Client: Initiates Add Product
 Client -> ProductSvc: POST /products (product data, JWT)
-ProductSvc -> AuthService: POST /auth/has-authority (JWT, "ADMIN")
+ProductSvc -> AuthService: POST /auth/verify-token (JWT, "ADMIN")
 alt Has authority
     AuthService --> ProductSvc: Token is valid, has authority
     ProductSvc -> ProductDB: Save new product
@@ -47,7 +47,7 @@ end
 == Update Product (Admin) ==
 Admin -> Client: Initiates Update Product (by ID)
 Client -> ProductSvc: PUT /products/{id} (updated product data, JWT)
-ProductSvc -> AuthService: POST /auth/has-authority (JWT, "ADMIN")
+ProductSvc -> AuthService: POST /auth/verify-token (JWT, "ADMIN")
 alt Has authority
     AuthService --> ProductSvc: Token is valid, has authority
     ProductSvc -> ProductDB: Find product by ID
@@ -70,7 +70,7 @@ end
 == Delete Product (Admin) ==
 Admin -> Client: Initiates Delete Product (by ID)
 Client -> ProductSvc: DELETE /products/{id} (JWT)
-ProductSvc -> AuthService: POST /auth/has-authority (JWT, "ADMIN")
+ProductSvc -> AuthService: POST  /auth/verify-token (JWT, "ADMIN")
 alt Has authority
     AuthService --> ProductSvc: Token is valid, has authority
     ProductSvc -> ProductDB: Delete product by ID

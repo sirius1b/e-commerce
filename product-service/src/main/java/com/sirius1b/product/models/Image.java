@@ -1,4 +1,4 @@
-package com.sirius1b.product.models.mongo;
+package com.sirius1b.product.models;
 
 
 import com.sirius1b.product.dtos.ImageDto;

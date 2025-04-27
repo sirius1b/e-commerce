@@ -1,4 +1,4 @@
-package com.sirius1b.product.common;
+package com.sirius1b.product.utils;
 
 public interface Constants {
 
