@@ -1,6 +1,5 @@
 package com.sirius1b.order.models;
 
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
