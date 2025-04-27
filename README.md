@@ -18,20 +18,21 @@ Super Repo for E-Commerce Backend Project
 
 ### Port
 
-** Services ** 
+** Services **
+
 - Auth: 8080
 - Product: 8081
-- Cart: 8082 
+- Cart: 8082
 - Order: 8083
 - Notification: 8084
 - Inventory: 8085
 - Payment: 8086
 
-** Systems ** 
+** Systems **
+
 - Redis: 6379
 - Mysql: 3306
 - Mongo: 27017
-
 
 - to implement:
 
@@ -43,15 +44,15 @@ Super Repo for E-Commerce Backend Project
     - [x] get user profile
     - [x] update user profile
     - [x] verify token with optional Role
-  
+
   - products
 
-    - [ ]get product(id,ids)
-    - [ ]list product
-    - [ ]post proudct
-    - [ ]update product
-    - [ ]delete product
-    - [ ]list categories
+    - [x] get product(id,ids)
+    - [x] list product
+    - [x] post proudct
+    - [x] update product
+    - [x] delete product
+    - [x] list categories
 
   - cart
 
