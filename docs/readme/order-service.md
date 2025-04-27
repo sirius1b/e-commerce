@@ -12,5 +12,3 @@ Processes orders post-checkout.
 - Save new order
 - Update status (e.g., paid, shipped)
 - Notify user (event)
-
-![](./svgs/cart-flow.svg)

@@ -7,8 +7,7 @@ Handles user carts and checkout session.
 - `POST /cart/remove` – Remove item from cart
 - `POST /cart/checkout` – Initiate checkout
 
-**Internal interface:**
+Note:
 
-- Calculate total price
-- Lock stock before checkout
-- Validate prices from Product Service
+- each api is user level, extract user_id from it from auth-service for that token by users/me api and use it cart api flow
+- there is will no priciing engine, pricing information will be stored in product-service,

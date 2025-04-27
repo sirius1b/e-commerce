@@ -1,12 +1,15 @@
 package com.sirius1b.auth.dtos;
 
 import com.sirius1b.auth.models.Token;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Date;
+
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@ToString
 public class TokenRespDto {
 
     private String token;

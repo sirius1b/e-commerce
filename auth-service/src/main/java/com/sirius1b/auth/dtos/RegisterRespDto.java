@@ -2,14 +2,14 @@ package com.sirius1b.auth.dtos;
 
 
 import com.sirius1b.auth.models.User;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 
 @Getter
 @Setter
 @ToString
+@AllArgsConstructor
+@NoArgsConstructor
 public class RegisterRespDto {
     private String email;
     private String name;

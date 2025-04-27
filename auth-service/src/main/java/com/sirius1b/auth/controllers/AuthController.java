@@ -47,10 +47,15 @@ public class AuthController {
 
 
     @PostMapping("/verify-token")
-    public VerifyDto verify(@RequestHeader("Authorization") String token) throws TokenNotFoundException {
+    public Boolean verify(@RequestHeader("Authorization") String token, @RequestHeader("X-ROLE") String role) throws TokenNotFoundException {
+        role = role == null || role.isEmpty() ? "USER": role;
+        return verifyToken(token, role) ;
+    }
+
+    private Boolean verifyToken(String token, String role) {
         token = token.substring(7);
         List<String> roles = userService.extractRoles(token);
-        return VerifyDto.from(token, roles);
+        return roles.contains(role);
     }
 
 

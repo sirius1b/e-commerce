@@ -7,7 +7,8 @@ Handles authentication, registration, and user profile.
 - `POST /auth/logout` – Logout user; delete token from redis
 - `GET /users/me` – Get current user profile
 - `PUT /users/me` – Update user profile
-- `POST /auth/verify-token` – Validate token with redis, optional parameter with Authority to check whether user token has authority of ADMIN or USER etc
+- `POST /auth/verify-token` – Validate token with redis,
+- 'POST /auth/has-authority' - validates token whether token is valid and has authority of parameter provided in request header ; This would an internal service
 
 **Internal interface (to other services):**
 
