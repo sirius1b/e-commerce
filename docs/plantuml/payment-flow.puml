@@ -1,0 +1,52 @@
+@startuml payment-flow
+actor User
+participant "Shopping Cart" as Cart
+participant "Order Service" as OrderSvc
+participant "Payment Service" as PaymentSvc
+participant "Razorpay Test Server" as Razorpay
+database "Order Database" as OrderDB
+database "Payment Database" as PaymentDB
+
+User -> Cart: Initiates Checkout
+Cart -> OrderSvc: Requests Order Creation
+OrderSvc -> OrderDB: Saves Order Details
+OrderDB --> OrderSvc: Order ID Generated
+
+OrderSvc -> PaymentSvc: Initiates Payment (Order ID, Amount, Payment Method)
+PaymentSvc -> PaymentDB: Stores Payment Attempt (Pending)
+PaymentSvc -> Razorpay: Sends Payment Request (Order ID, Amount, Currency, etc.)
+Razorpay -->> PaymentSvc: Payment Page URL & Order Details
+User <-- PaymentSvc: Redirects to Razorpay Payment Page
+User -> Razorpay: Enters Payment Details & Submits
+Razorpay -->> User: Payment Processing / Redirection
+
+alt Payment Success (Webhook Notification)
+Razorpay -> PaymentSvc: Sends Webhook Notification (Payment ID, Status=Success, Order ID)
+PaymentSvc -> PaymentDB: Updates Payment Status (Success, Razorpay Payment ID)
+PaymentSvc -> OrderSvc: Notifies Payment Success (Order ID, Razorpay Payment ID)
+OrderSvc -> OrderDB: Updates Order Status (Payment Received)
+OrderDB --> OrderSvc: Acknowledges Update
+OrderSvc -> User: Order Confirmation
+else Payment Failure (Webhook Notification)
+Razorpay -> PaymentSvc: Sends Webhook Notification (Payment ID, Status=Failed, Order ID, Error Details)
+PaymentSvc -> PaymentDB: Updates Payment Status (Failed, Razorpay Payment ID, Error Details)
+PaymentSvc -> OrderSvc: Notifies Payment Failure (Order ID, Error Details)
+OrderSvc -> User: Payment Declined Notification
+else Payment Pending (User Redirect)
+Razorpay -->> User: Redirects back to Platform (with Status/Payment ID)
+User -> PaymentSvc: Queries Payment Status (Payment ID)
+PaymentSvc -> Razorpay: Requests Payment Details (Payment ID)
+Razorpay -->> PaymentSvc: Returns Payment Status (Success/Failure)
+alt Payment Now Successful
+PaymentSvc -> PaymentDB: Updates Payment Status (Success, Razorpay Payment ID)
+PaymentSvc -> OrderSvc: Notifies Payment Success (Order ID, Razorpay Payment ID)
+OrderSvc -> OrderDB: Updates Order Status (Payment Received)
+OrderDB --> OrderSvc: Acknowledges Update
+OrderSvc -> User: Order Confirmation
+else Payment Still Pending/Failed
+PaymentSvc -> PaymentDB: Updates/Maintains Payment Status
+OrderSvc -> User: Updates Order/Payment Status
+end
+end
+
+@enduml

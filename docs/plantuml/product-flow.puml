@@ -1,0 +1,100 @@
+@startuml product-flow
+actor User
+actor Admin
+participant "Client Application" as Client
+participant "Product Service" as ProductSvc
+database "Product Database" as ProductDB
+participant "Authentication Service" as AuthService
+
+
+== List Products ==
+User -> Client: Requests Product List (with optional filters, pagination)
+Client -> ProductSvc: GET /products (filters, page, limit)
+ProductSvc -> ProductDB: Query products (with applied filters, pagination)
+ProductDB --> ProductSvc: List of products
+ProductSvc --> Client: List of products (paginated)
+Client --> User: Displays product list
+
+== Get Product Details ==
+User -> Client: Requests Product Details (by ID)
+Client -> ProductSvc: GET /products/{id}
+ProductSvc -> ProductDB: Find product by ID
+ProductDB --> ProductSvc: Product details (or not found)
+alt Product found
+    ProductSvc --> Client: Product details
+    Client --> User: Displays product details
+else Product not found
+    ProductSvc --> Client: Product not found
+    Client --> User: Displays "product not found" message
+end
+
+== Add a Product (Admin) ==
+Admin -> Client: Initiates Add Product
+Client -> ProductSvc: POST /products (product data, JWT)
+ProductSvc -> AuthService: POST /auth/verify-token (JWT, "ADMIN")
+alt Has authority
+    AuthService --> ProductSvc: Token is valid, has authority
+    ProductSvc -> ProductDB: Save new product
+    ProductDB --> ProductSvc: Product saved confirmation (with new ID)
+    ProductSvc --> Client: Product added successfully
+    Client --> Admin: Product added confirmation
+else Does not have authority
+    AuthService --> ProductSvc: Unauthorized
+    ProductSvc --> Client: Unauthorized
+    Client --> Admin: Unauthorized message
+end
+
+== Update Product (Admin) ==
+Admin -> Client: Initiates Update Product (by ID)
+Client -> ProductSvc: PUT /products/{id} (updated product data, JWT)
+ProductSvc -> AuthService: POST /auth/verify-token (JWT, "ADMIN")
+alt Has authority
+    AuthService --> ProductSvc: Token is valid, has authority
+    ProductSvc -> ProductDB: Find product by ID
+    ProductDB --> ProductSvc: Product details (or not found)
+    alt Product found
+        ProductSvc -> ProductDB: Update product (by ID, with new data)
+        ProductDB --> ProductSvc: Update successful
+        ProductSvc --> Client: Product updated successfully
+        Client --> Admin: Product updated confirmation
+    else Product not found
+        ProductSvc --> Client: Product not found
+        Client --> Admin: Product not found message
+    end
+else Does not have authority
+    AuthService --> ProductSvc: Unauthorized
+    ProductSvc --> Client: Unauthorized
+    Client --> Admin: Unauthorized message
+end
+
+== Delete Product (Admin) ==
+Admin -> Client: Initiates Delete Product (by ID)
+Client -> ProductSvc: DELETE /products/{id} (JWT)
+ProductSvc -> AuthService: POST  /auth/verify-token (JWT, "ADMIN")
+alt Has authority
+    AuthService --> ProductSvc: Token is valid, has authority
+    ProductSvc -> ProductDB: Delete product by ID
+    ProductDB --> ProductSvc: Delete successful (or not found)
+    alt Delete successful
+        ProductSvc --> Client: Product deleted successfully
+        Client --> Admin: Product deleted confirmation
+    else Product not found
+        ProductSvc --> Client: Product not found
+        Client --> Admin: Product not found message
+    end
+else Does not have authority
+    AuthService --> ProductSvc: Unauthorized
+    ProductSvc --> Client: Unauthorized
+    Client --> Admin: Unauthorized message
+end
+
+== List Categories ==
+User -> Client: Requests Category List
+Client -> ProductSvc: GET /categories
+ProductSvc -> ProductDB: Query all categories
+ProductDB --> ProductSvc: List of categories
+ProductSvc --> Client: List of categories
+Client --> User: Displays category list
+
+
+@enduml

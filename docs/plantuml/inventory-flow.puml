@@ -1,0 +1,53 @@
+@startuml inventory-flow
+actor Admin
+
+participant "Client Application[Internal]" as Client
+participant "Inventory Service" as InventorySvc
+database "Inventory Database" as InventoryDB
+participant "Authentication Service" as AuthService
+
+== Lock Stock ==
+Client -> InventorySvc: POST /inventory/lock-stock (items: [{product_id, quantity}])
+InventorySvc -> InventoryDB: Begin Transaction
+
+InventorySvc -> InventoryDB: Check if stock is sufficient for all items
+alt Stock is sufficient for all items
+    loop for each item in items
+        InventorySvc -> InventoryDB: Update stock (subtract quantity)
+        InventoryDB --> InventorySvc: OK
+    end
+    InventorySvc -> InventoryDB: Commit Transaction
+    InventorySvc --> Client: Stock lock successful
+else Stock is insufficient for one or more items
+    InventorySvc -> InventoryDB: Rollback Transaction
+    InventorySvc --> Client: Stock lock failed
+end
+
+== Unlock Stock ==
+Client -> InventorySvc: POST /inventory/unlock-stock (items: [{product_id, quantity}])
+InventorySvc -> InventoryDB: Begin Transaction
+loop for each item in items
+    InventorySvc -> InventoryDB: Update stock (add quantity)
+    InventoryDB --> InventorySvc: OK
+end
+InventorySvc -> InventoryDB: Commit Transaction
+InventorySvc --> Client: Stock unlock successful
+
+== Get Stock ==
+Client -> InventorySvc: GET /inventory/stock/{product_id}
+InventorySvc -> InventoryDB: Get stock for product_id
+InventoryDB --> InventorySvc: Stock quantity
+InventorySvc --> Client: Stock quantity
+
+== Update Stock (Admin) ==
+
+Admin -> InventorySvc: PUT /inventory/stock/{product_id} (new_quantity)
+InventorySvc-> AuthService: POST /auth/verify-token (JWT, "ADMIN")
+alt Has authority
+InventorySvc -> InventoryDB: Update stock for product_id (new_quantity)
+InventoryDB --> InventorySvc: OK
+InventorySvc --> Admin: Stock updated successfully
+else Does not have authority
+InventorySvc --> Admin: Unauthorized
+end
+@enduml

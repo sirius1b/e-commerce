@@ -1,12 +1,14 @@
 package com.sirius1b.auth.dtos;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@ToString
 public class UserInfoDto {
     private String name;
     private String email;

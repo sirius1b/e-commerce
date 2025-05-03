@@ -1,0 +1,55 @@
+@startuml order-flow
+actor User 
+participant "Client Application" as Client
+participant "Order Service" as OrderSvc
+database "Order Database" as OrderDB
+participant "Payment Service" as PaymentSvc
+participant "Notification Service" as NotificationSvc
+actor Admin
+
+== Create Order (from checkout) ==
+User -> Client: Completes Checkout
+Client -> OrderSvc: POST /orders (order details, user ID)
+OrderSvc -> OrderDB: Save new order
+OrderDB --> OrderSvc: Order ID
+OrderSvc -> PaymentSvc: make payment
+PaymentSvc --> OrderSvc: Payment Status
+OrderSvc --> Client: Payment Pending Status
+
+
+alt Payment successful
+    PaymentSvc -> OrderSvc: Payment Success
+
+    OrderSvc -> OrderDB: Update order status (e.g., "success")
+    OrderDB --> OrderSvc: OK
+    OrderSvc -> NotificationSvc: Notify user (order confirmation)
+else Payment failed
+    PaymentSvc -> OrderSvc: Payment fail
+    OrderSvc -> OrderDB: Update order status (e.g., "payment_failed")
+    OrderDB --> OrderSvc: OK
+    OrderSvc -> NotificationSvc: Notify user (order confirmation)
+end
+
+== List User's Orders ==
+User -> Client: Requests Order History
+Client -> OrderSvc: GET /orders (user ID)
+OrderSvc -> OrderDB: Retrieve orders for user
+OrderDB --> OrderSvc: List of orders
+OrderSvc --> Client: List of orders
+Client <-- User: Order history displayed
+
+== Order Details ==
+User -> Client: Requests Order Details (by ID)
+Client -> OrderSvc: GET /orders/{id}
+OrderSvc -> OrderDB: Retrieve order by ID
+OrderDB --> OrderSvc: Order details
+OrderSvc --> Client: Order details
+Client <-- User: Order details displayed
+
+== Update Order Status (Admin) ==
+Admin -> OrderSvc: PUT /orders/{id}/status (new status)
+OrderSvc -> OrderDB: Update order status (new status)
+OrderDB --> OrderSvc: OK
+OrderSvc -> NotificationSvc: Notify user (status update)
+OrderSvc --> Admin: Status updated
+@enduml

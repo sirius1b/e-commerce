@@ -1,15 +1,15 @@
 package com.sirius1b.auth.dtos;
 
-import com.sirius1b.auth.models.Token;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@ToString
 public class VerifyDto {
 
     private String token;

@@ -29,6 +29,8 @@ public class SecurityConfig {
                                 .requestMatchers("/auth/register").permitAll()
                                 .requestMatchers("/auth/login").permitAll()
                                 .requestMatchers("/auth/logout").permitAll()
+                                .requestMatchers("/swagger-ui/**").permitAll()
+                                .requestMatchers("/v3/api-docs/**").permitAll()
                                 .requestMatchers("/auth/verify-token").hasAnyAuthority(Roles.ADMIN.toString(), Roles.USER.toString())
                                 .requestMatchers("/user/me").hasAuthority(Roles.USER.toString())
                                 .anyRequest().authenticated())

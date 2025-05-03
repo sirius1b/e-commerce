@@ -1,0 +1,24 @@
+
+@startuml notification
+participant "Order Service" as OrderSvc
+participant "Notification Service" as NotificationSvc
+participant "SMTP Server" as SMTP
+participant "Authentication Service" as AuthService
+
+== Order Confirmation Notification ==
+OrderSvc -> NotificationSvc: Notify user (order confirmation details, user ID)
+NotificationSvc -> AuthService: GET /users/me (user ID)
+AuthService --> NotificationSvc: User email
+NotificationSvc -> SMTP: Send email (order confirmation details, user email)
+SMTP --> NotificationSvc: OK
+NotificationSvc --> OrderSvc: OK
+
+== Order Status Update Notification ==
+OrderSvc -> NotificationSvc: Notify user (status update details, user ID)
+NotificationSvc -> AuthService: GET /users/me (user ID)
+AuthService --> NotificationSvc: User email
+NotificationSvc -> SMTP: Send email (status update details, user email)
+SMTP --> NotificationSvc: OK
+NotificationSvc --> OrderSvc: OK
+
+@enduml

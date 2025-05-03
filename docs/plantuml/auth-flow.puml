@@ -1,0 +1,122 @@
+@startuml
+actor User
+participant "Client Application" as Client
+participant "Authentication Service" as AuthService
+database "User Database" as UserDB
+database "Redis" as Redis
+
+box "Internal Interface" #LightBlue
+    participant "Other Services" as OtherSvc
+end box
+
+== User Registration ==
+User -> Client: Initiates Registration
+Client -> AuthService: POST /auth/register (user: {name, email, password, roles})
+AuthService -> UserDB: Checks if user with email exists
+alt User does not exist
+    AuthService -> UserDB: Creates new user
+    UserDB --> AuthService: User created (user ID, roles)
+    AuthService -> AuthService: Generates JWT (including roles, user ID)
+    AuthService --> Client: Registration Successful (JWT)
+    Client <-- User: Registration Successful (JWT)
+else User exists
+    AuthService --> Client: Registration Failed (Email already exists)
+    Client <-- User: Registration Failed
+end
+
+== User Login ==
+User -> Client: Initiates Login
+Client -> AuthService: POST /auth/login (email, password)
+AuthService -> UserDB: Authenticates user
+alt Authentication successful
+    AuthService -> AuthService: Generates JWT (including roles, user ID)
+    AuthService -> Redis: SET JWT (JWT, user ID, TTL)
+    Redis --> AuthService: OK
+    AuthService --> Client: JWT
+    Client <-- User: Login Successful (JWT)
+else Authentication failed
+    AuthService --> Client: Login Failed (Invalid credentials)
+    Client <-- User: Login Failed
+end
+
+== User Logout ==
+User -> Client: Initiates Logout
+Client -> AuthService: POST /auth/logout (JWT)
+AuthService -> Redis: DEL JWT
+Redis --> AuthService: (ACK)
+AuthService --> Client: Logout Successful
+Client <-- User: Logout Successful
+
+== Get User Profile ==
+User -> Client: Requests User Profile
+Client -> AuthService: GET /users/me (with JWT)
+AuthService -> AuthService: Validates JWT (internally)
+alt JWT is valid
+    AuthService -> Redis: GET user ID by JWT
+    Redis --> AuthService: user ID
+    AuthService -> UserDB: Get user info by ID (user ID from Redis)
+    UserDB --> AuthService: User profile data
+    AuthService --> Client: User profile data
+    Client <-- User: User profile displayed
+else JWT is invalid or expired
+    AuthService --> Client: Unauthorized
+    Client <-- User: Unauthorized
+end
+
+== Update User Profile ==
+User -> Client: Initiates Profile Update
+Client -> AuthService: PUT /users/me (with JWT, updated user data)
+AuthService -> AuthService: Validates JWT (internally)
+alt JWT is valid
+    AuthService -> Redis: GET user ID by JWT
+    Redis --> AuthService: user ID
+    AuthService -> UserDB: Updates user profile (user ID, updated data)
+    UserDB --> AuthService: Update successful
+    AuthService --> Client: Update successful
+    Client <-- User: Profile updated successfully
+else JWT is invalid or expired
+    AuthService --> Client: Unauthorized
+    Client <-- User: Unauthorized
+end
+
+== Verify Token Endpoint ==
+Client -> AuthService: POST /auth/verify-token (JWT, optional authority)
+AuthService -> AuthService: Validates JWT (internally)
+alt JWT is valid
+    AuthService -> Redis: GET user ID by JWT
+    Redis --> AuthService: user ID
+    AuthService -> UserDB: Get user roles by ID
+    UserDB --> AuthService: User roles
+    alt Authority check requested
+        AuthService -> AuthService: Checks if user has required authority
+        alt Has authority
+            AuthService --> Client: Token is valid
+        else Does not have authority
+            AuthService --> Client: Unauthorized
+        end
+    else Authority check not requested
+        AuthService --> Client: Token is valid
+    end
+else JWT is invalid or expired
+    AuthService --> Client: Token is invalid
+end
+
+
+== Internal Has Authority Check(Verify Token) ==
+OtherSvc -> AuthService: POST  /auth/verify-token (JWT, authority)
+AuthService -> AuthService: Validates JWT (internally)
+alt JWT is valid
+    AuthService -> Redis: GET user ID by JWT
+    Redis --> AuthService: user ID
+    AuthService -> UserDB: Get user roles by ID
+    UserDB --> AuthService: User roles
+    AuthService -> AuthService: Checks if user has required authority
+    alt Has authority
+        AuthService --> OtherSvc: Token is valid, has authority
+    else Does not have authority
+        AuthService --> OtherSvc: Unauthorized
+    end
+else JWT is invalid or expired
+    AuthService --> OtherSvc: Token is invalid
+end
+@enduml

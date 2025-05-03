@@ -2,32 +2,44 @@ package com.sirius1b.product.services;
 
 import com.sirius1b.product.dtos.CategoryDto;
 import com.sirius1b.product.dtos.ProductDto;
-import com.sirius1b.product.models.mongo.Category;
-import com.sirius1b.product.models.mongo.Product;
-import com.sirius1b.product.repos.mongo.ProductMRepository;
+import com.sirius1b.product.models.Category;
+import com.sirius1b.product.models.Product;
+import com.sirius1b.product.repos.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 
 @Service
 public class ProductService {
 
     @Autowired
-    private ProductMRepository productRepository;
+    private ProductRepository productRepository;
 
-    public List<ProductDto> getAllProducts() {
-        return productRepository.findAll().stream().map(ProductDto::from).toList();
+    public List<ProductDto> getAllProducts(String name, String category, int page, int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Product> results ;
+        if (name != null){
+            results =  productRepository.findByNameContainingIgnoreCase(name, pageable);
+        } else if (category != null ){
+            results = productRepository.findByCategoriesNameIn(List.of(category), pageable );
+        } else {
+            results = productRepository.findAll(pageable);
+        }
+
+        return results.stream().map(ProductDto::from).toList();
     }
 
     public List<CategoryDto> getCategories() {
         List<Category> categories = new ArrayList<>();
         productRepository.findAll().forEach(p -> categories.addAll(p.getCategories()));
-        return categories.stream().map(CategoryDto::from).toList();
+        return categories.stream().distinct().map(CategoryDto::from).toList();
     }
 
     public ProductDto createProduct(ProductDto productDto) {
