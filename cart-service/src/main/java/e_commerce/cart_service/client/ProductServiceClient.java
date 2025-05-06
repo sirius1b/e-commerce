@@ -1,14 +1,27 @@
 package e_commerce.cart_service.client;
 
-import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 import e_commerce.cart_service.dto.ProductInfo;
 
-@FeignClient(name = "product-service")
-public interface ProductServiceClient {
+@Service
+public class ProductServiceClient {
     
-    @GetMapping("/products/{skuId}")
-    ProductInfo getProductInfo(@PathVariable("skuId") String skuId);
+    private final RestTemplate restTemplate;
+    private final String productServiceUrl;
+    
+    @Autowired
+    public ProductServiceClient(RestTemplate restTemplate, 
+                               @Value("${product-service.url:http://localhost:8081}") String productServiceUrl) {
+        this.restTemplate = restTemplate;
+        this.productServiceUrl = productServiceUrl;
+    }
+    
+    public ProductInfo getProductInfo(String skuId) {
+        String url = productServiceUrl + "/products/" + skuId;
+        return restTemplate.getForObject(url, ProductInfo.class);
+    }
 }

@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.kafka.core.KafkaTemplate;
+// import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import e_commerce.cart_service.client.InventoryServiceClient;
@@ -38,8 +38,8 @@ public class CartService {
     @Autowired
     private InventoryServiceClient inventoryServiceClient;
     
-    @Autowired
-    private KafkaTemplate<String, Object> kafkaTemplate;
+    // @Autowired
+    // private KafkaTemplate<String, Object> kafkaTemplate;
     
     @Autowired
     private JwtUtils jwtUtils;
@@ -173,7 +173,7 @@ public class CartService {
         event.setTotal(cart.getTotal());
         
         // Send event to Kafka
-        kafkaTemplate.send("cart.checkout.initiated", event);
+        // kafkaTemplate.send("cart.checkout.initiated", event);
     }
     
     // Inner class for checkout event

@@ -2,6 +2,11 @@ package e_commerce.cart_service.model;
 
 import java.io.Serializable;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class CartItem implements Serializable {
     private static final long serialVersionUID = 1L;
     
@@ -9,7 +14,7 @@ public class CartItem implements Serializable {
     private String name;
     private long price;
     private int quantity;
-    
+
     public CartItem() {}
     
     public CartItem(String skuId, String name, long price, int quantity) {
