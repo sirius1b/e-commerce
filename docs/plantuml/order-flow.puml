@@ -4,8 +4,7 @@ participant "Client Application" as Client
 participant "Order Service" as OrderSvc
 database "Order Database" as OrderDB
 participant "Payment Service" as PaymentSvc
-participant "Notification Service" as NotificationSvc
-actor Admin
+participant "Notification Service" as Notific
 
 == Create Order (from checkout) ==
 User -> Client: Completes Checkout

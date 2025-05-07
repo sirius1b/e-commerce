@@ -13,39 +13,71 @@ end box
 == Get Current Cart ==
 User -> Client: Requests Current Cart (with JWT)
 Client -> CartSvc: GET /cart (JWT)
+note left 
+GET /cart 
+--
+Authorization: Bearer <JWT>
+end note
 CartSvc -> AuthService: GET /users/me (JWT)
+note left
+GET /users/me
+--
+headers
+-- 
+body
+user/me api 
+request/header
+end note
 AuthService --> CartSvc: User ID
+note left 
+200 /users/me
+--
+headers
+-- 
+body
+user/me api 
+request/header
+end note
 CartSvc -> CartDB: Retrieve cart for User ID
 CartDB --> CartSvc: Cart data
 CartSvc --> Client: Cart data
-Client <-- User: Displays current cart
+note left 
+200, OK
+--
+header
+--
+body
+end note
+Client --> User: Displays current cart
 
-== Add Item to Cart ==
-User -> Client: Adds Item to Cart (product ID, quantity, JWT)
-Client -> CartSvc: POST /cart/add (product ID, quantity, JWT)
+== Add/Remove Item to Cart ==
+User -> Client: Upsert Item to Cart 
+Client -> CartSvc: POST /cart/items 
+note left
+PUT /cart/{cart_id}/items
+--
+Authorization: JWT
+--
+[{"product_id": "12345",
+    "quantity": 2},...]
+end note
 CartSvc -> AuthService: GET /users/me (JWT)
 AuthService --> CartSvc: User ID
-CartSvc -> ProductSvc: Get product details (product ID)
-ProductSvc --> CartSvc: Product details (name, price, stock)
-alt Stock is sufficient
-    CartSvc -> CartDB: Add/update item in cart for User ID
-    CartDB --> CartSvc: Cart updated
-    CartSvc --> Client: Cart updated
-    Client <-- User: Cart updated confirmation
-else Stock is insufficient
-    CartSvc --> Client: Insufficient stock
-    Client <-- User: Insufficient stock message
-end
-
-== Remove Item from Cart ==
-User -> Client: Removes Item from Cart (item ID, JWT)
-Client -> CartSvc: POST /cart/remove (item ID, JWT)
-CartSvc -> AuthService: GET /users/me (JWT)
-AuthService --> CartSvc: User ID
-CartSvc -> CartDB: Remove item from cart for User ID
+' CartSvc -> ProductSvc: Get product details (product ID)
+' ProductSvc --> CartSvc: Product details (name, price, stock)
+CartSvc -> CartDB: Add/update item in cart for User ID
 CartDB --> CartSvc: Cart updated
 CartSvc --> Client: Cart updated
-Client <-- User: Cart updated confirmation
+note left
+200, OK
+--
+header
+--
+cart information
+end note
+Client --> User: Cart updated confirmation
+
+
 
 == Initiate Checkout ==
 User -> Client: Initiates Checkout (JWT)
@@ -54,9 +86,9 @@ CartSvc -> AuthService: GET /users/me (JWT)
 AuthService --> CartSvc: User ID
 CartSvc -> CartDB: Retrieve cart for User ID
 CartDB --> CartSvc: Cart data with item IDs and quantities
-CartSvc -> ProductSvc: Get product details for all items
-ProductSvc --> CartSvc: List of product details (name, price, stock)
-CartSvc -> CartSvc: Calculate total price (cart items with quantities and prices)
+' CartSvc -> ProductSvc: Get product details for all items
+' ProductSvc --> CartSvc: List of product details (name, price, stock)
+' CartSvc -> CartSvc: Calculate total price (cart items with quantities and prices)
 CartSvc -> Inventory: Lock stock (cart items with quantities)
 Inventory --> CartSvc: Stock lock status (Success/Failure)
 alt Stock lock successful
