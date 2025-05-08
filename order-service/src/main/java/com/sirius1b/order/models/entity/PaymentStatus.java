@@ -1,10 +1,10 @@
-package com.sirius1b.order.models;
+package com.sirius1b.order.models.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 
 @Entity
-public class OrderStatus extends BaseModel {
+public class PaymentStatus extends BaseModel {
 
     @Column(nullable = false, unique = true)
     private String value;

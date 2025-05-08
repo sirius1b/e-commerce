@@ -1,4 +1,4 @@
-package com.sirius1b.order.models;
+package com.sirius1b.order.models.entity;
 
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;

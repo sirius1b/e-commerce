@@ -1,6 +1,6 @@
 package com.sirius1b.order.repos;
 
-import com.sirius1b.order.models.Order;
+import com.sirius1b.order.models.entity.Order;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
