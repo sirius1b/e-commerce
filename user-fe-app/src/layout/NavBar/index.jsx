@@ -28,6 +28,9 @@ export default function NavBar() {
             <Nav.Link as={Link} to="/signup">
               Sign Up
             </Nav.Link>
+            <Nav.Link as={Link} to="/products">
+              Products
+            </Nav.Link>
           </Nav>
         </Navbar.Collapse>
       </Container>

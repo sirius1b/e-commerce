@@ -1,7 +1,13 @@
 import { Routes, Route, BrowserRouter } from "react-router-dom";
-
-import { Home, LoginPage, Dashboard, NotFound, SignUpForm } from "@/pages";
-import { Cataloge } from "../pages";
+import {
+  Home,
+  LoginPage,
+  Dashboard,
+  NotFound,
+  SignUpForm,
+  Cataloge,
+} from "../pages";
+import React from "react";
 
 const Routers = () => {
   return (
