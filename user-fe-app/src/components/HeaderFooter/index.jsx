@@ -5,9 +5,13 @@ import { Footer, Header, NavBar } from "../../layout";
 const HeaderFooter = (props) => {
   return (
     <>
-      <Header />
+      {/* <Header /> */}
       <NavBar />
-      {props.children}
+      <div
+        style={{ minHeight: "93vh", display: "flex", flexDirection: "column" }}
+      >
+        {props.children}
+      </div>
       <Footer />
     </>
   );

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Container, Form, Button, Alert } from "react-bootstrap";
+import { Container, Form, Button, Alert, Card } from "react-bootstrap";
 import { HeaderFooter } from "../../components";
 
 function SignupForm() {
@@ -51,54 +51,56 @@ function SignupForm() {
   return (
     <HeaderFooter>
       <Container style={{ maxWidth: "500px", margin: "50px auto" }}>
-        <h2>Sign Up</h2>
-        {error && <Alert variant="danger">{error}</Alert>}
-        {success && <Alert variant="success">{success}</Alert>}
-        <Form onSubmit={handleSubmit}>
-          <Form.Group className="mb-3" controlId="formName">
-            <Form.Label>Name</Form.Label>
-            <Form.Control
-              type="text"
-              placeholder="Enter name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-          </Form.Group>
+        <Card className="p-4 shadow-sm">
+          <h2>Sign Up</h2>
+          {error && <Alert variant="danger">{error}</Alert>}
+          {success && <Alert variant="success">{success}</Alert>}
+          <Form onSubmit={handleSubmit}>
+            <Form.Group className="mb-3" controlId="formName">
+              <Form.Label>Name</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Enter name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+            </Form.Group>
 
-          <Form.Group className="mb-3" controlId="formEmail">
-            <Form.Label>Email address</Form.Label>
-            <Form.Control
-              type="email"
-              placeholder="Enter email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </Form.Group>
+            <Form.Group className="mb-3" controlId="formEmail">
+              <Form.Label>Email address</Form.Label>
+              <Form.Control
+                type="email"
+                placeholder="Enter email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </Form.Group>
 
-          <Form.Group className="mb-3" controlId="formPassword">
-            <Form.Label>Password</Form.Label>
-            <Form.Control
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </Form.Group>
+            <Form.Group className="mb-3" controlId="formPassword">
+              <Form.Label>Password</Form.Label>
+              <Form.Control
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </Form.Group>
 
-          <Form.Group className="mb-3" controlId="formRetypePassword">
-            <Form.Label>Retype Password</Form.Label>
-            <Form.Control
-              type="password"
-              placeholder="Retype Password"
-              value={retypePassword}
-              onChange={(e) => setRetypePassword(e.target.value)}
-            />
-          </Form.Group>
+            <Form.Group className="mb-3" controlId="formRetypePassword">
+              <Form.Label>Retype Password</Form.Label>
+              <Form.Control
+                type="password"
+                placeholder="Retype Password"
+                value={retypePassword}
+                onChange={(e) => setRetypePassword(e.target.value)}
+              />
+            </Form.Group>
 
-          <Button variant="primary" type="submit">
-            Sign Up
-          </Button>
-        </Form>
+            <Button variant="primary" type="submit">
+              Sign Up
+            </Button>
+          </Form>
+        </Card>
       </Container>
     </HeaderFooter>
   );
