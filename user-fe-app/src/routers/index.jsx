@@ -6,6 +6,7 @@ import {
   NotFound,
   SignUpForm,
   Cataloge,
+  Product,
 } from "../pages";
 import React from "react";
 
@@ -18,7 +19,8 @@ const Routers = () => {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignUpForm />} />
-          <Route path="/products" element={<Cataloge />} />
+          <Route path="/products" element={<Cataloge />} />\
+          <Route path="/product" element={<Product />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

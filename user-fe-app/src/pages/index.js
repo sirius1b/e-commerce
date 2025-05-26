@@ -4,3 +4,5 @@ export { default as Dashboard } from "./Dashboard";
 export { default as NotFound } from "./NotFound";
 export { default as SignUpForm } from "./SignUpForm";
 export { default as Cataloge } from "./Cataloge";
+export { default as Product } from "./Product";
+
