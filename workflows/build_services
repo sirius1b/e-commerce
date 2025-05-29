@@ -1,0 +1,16 @@
+#! /bin/bash
+
+services=("product-service" "order-service" "auth-service")
+
+mkdir -p build/
+
+for service in ${services[@]}; do 
+    mkdir -p build/${service} &&\
+    cd ${service} &&\
+    ./gradlew clean build -x check &&\
+    cp build/libs/*SNAPSHOT.jar ../build/${service}/ &&\
+    echo "🟢 Build ${service} complete"
+    cp src/main/resources/application.properties ../build/${service}/ &&\
+    echo "🟢 Updated ${service} configuration"
+    cd ..
+done

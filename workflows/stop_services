@@ -1,0 +1,20 @@
+#! /bin/bash
+
+services=(
+    "product-service" 
+    "order-service" 
+    "auth-service"
+    )
+
+mkdir -p logs/
+
+for service in ${services[@]}; do 
+    pss=$(ps aux | grep ${service} | wc -l)
+    if [ ${pss} -eq 1 ]; then
+        echo "🔴 ${service} is not running"
+        continue
+    else
+        id=$( ps aux|grep ${service}| head -1| awk '{print $2}' )
+        kill -9 ${id} && echo "🔴 Stopped ${service}"
+    fi
+done

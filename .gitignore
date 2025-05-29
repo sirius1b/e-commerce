@@ -146,6 +146,7 @@ node_modules
 **/build/
 **/.gradle/
 
+logs
 .idea
 
 */.idea

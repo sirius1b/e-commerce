@@ -1,0 +1,14 @@
+#! /bin/bash
+
+services=(
+    "product-service" 
+    "order-service" 
+    "auth-service"
+    )
+
+mkdir -p logs/
+
+for service in ${services[@]}; do 
+    java -jar build/${service}/*SNAPSHOT.jar --spring.config.location=build/${service}/ > logs/${service}.logs 2>&1 && \
+    echo "🟢 Started ${service}" 
+done

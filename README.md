@@ -40,3 +40,13 @@ Super Repo for E-Commerce Backend Project
 - [Payment Service](./docs/readme/payment-service.md)
 
 Progress [here](./todos.md)
+
+---
+
+### Local Workflows - Dev & Test
+
+```
+bash workflows/build_services
+bash workflows/start_services
+bash workflows/stop_services
+```
