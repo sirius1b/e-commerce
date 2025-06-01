@@ -1,4 +1,4 @@
-package e_commerce.cart_service.dto;
+package e_commerce.cart_service.dto.response;
 
 public class CheckoutResponse {
     private String status;

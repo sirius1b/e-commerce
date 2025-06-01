@@ -1,62 +1,66 @@
 package e_commerce.cart_service.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import e_commerce.cart_service.dto.AddItemRequest;
-import e_commerce.cart_service.dto.CheckoutResponse;
-import e_commerce.cart_service.dto.RemoveItemRequest;
-import e_commerce.cart_service.exception.CartEmptyException;
-import e_commerce.cart_service.exception.CheckoutException;
+import e_commerce.cart_service.client.AuthServiceClient;
+import e_commerce.cart_service.dto.request.AddItemRequest;
+import e_commerce.cart_service.dto.request.RemoveItemRequest;
+import e_commerce.cart_service.dto.response.CheckoutResponse;
 import e_commerce.cart_service.model.Cart;
 import e_commerce.cart_service.service.CartService;
-
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/cart")
 public class CartController {
-    
+
     @Autowired
     private CartService cartService;
-    
+
+    @Autowired
+    private AuthServiceClient authServiceClient;
+
     @GetMapping
-    public ResponseEntity<Cart> getCart(@RequestHeader("Authorization") String token) {
-        Cart cart = cartService.getCart(token);
+    public ResponseEntity<Cart> getCart(@RequestHeader("Authorization") String token) throws Exception {
+        if (!authServiceClient.verifyToken(token)) {
+            throw new Exception("Invalid token");
+        }
+        String userId = authServiceClient.getUserIdFromToken(token);
+        Cart cart = cartService.getCart(userId);
         return ResponseEntity.ok(cart);
     }
-    
-    @PostMapping("/cart/add")
+
+    @PostMapping("/add")
     public ResponseEntity<Cart> addItemToCart(
             @RequestHeader("Authorization") String token,
-            @RequestBody AddItemRequest request) {
-        Cart cart = cartService.addItemToCart(token, request);
+            @RequestBody AddItemRequest request) throws Exception {
+        if (!authServiceClient.verifyToken(token)) {
+            throw new Exception("Invalid token");
+        }
+        String userId = authServiceClient.getUserIdFromToken(token);
+        Cart cart = cartService.addItemToCart(userId, request);
         return ResponseEntity.ok(cart);
     }
-    
-    @PostMapping("/cart/remove")
+
+    @PostMapping("/remove")
     public ResponseEntity<Cart> removeItemFromCart(
             @RequestHeader("Authorization") String token,
-            @RequestBody RemoveItemRequest request) {
-        Cart cart = cartService.removeItemFromCart(token, request.getSkuId());
+            @RequestBody RemoveItemRequest request) throws Exception {
+        if (!authServiceClient.verifyToken(token)) {
+            throw new Exception("Invalid token");
+        }
+        String userId = authServiceClient.getUserIdFromToken(token);
+        Cart cart = cartService.removeItemFromCart(userId, request.getSkuId());
         return ResponseEntity.ok(cart);
     }
-    
-    @PostMapping("/cart/checkout")
-    public ResponseEntity<?> checkout(@RequestHeader("Authorization") String token) {
-        try {
-            CheckoutResponse response = cartService.checkout(token);
-            return ResponseEntity.ok(response);
-        } catch (CartEmptyException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        } catch (CheckoutException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+
+    @PostMapping("/checkout")
+    public ResponseEntity<String> checkoutCart(@RequestHeader("Authorization") String token) throws Exception {
+        if (!authServiceClient.verifyToken(token)) {
+            throw new Exception("Invalid token");
         }
+        String userId = authServiceClient.getUserIdFromToken(token);
+        String checkoutResponse = cartService.checkoutCart(userId);
+        return ResponseEntity.ok(checkoutResponse);
     }
 }

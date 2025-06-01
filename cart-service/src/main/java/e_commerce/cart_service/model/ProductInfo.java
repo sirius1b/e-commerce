@@ -1,4 +1,4 @@
-package e_commerce.cart_service.dto;
+package e_commerce.cart_service.model;
 
 public class ProductInfo {
     private String skuId;

@@ -1,4 +1,4 @@
-package e_commerce.cart_service.dto;
+package e_commerce.cart_service.dto.request;
 
 public class AddItemRequest {
     private String skuId;
