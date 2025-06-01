@@ -18,4 +18,10 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleServiceError(ServiceException ex) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong.");
     }
+
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<?> handleUnauthorized(UnauthorizedException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized access.");
+    }
+    
 }

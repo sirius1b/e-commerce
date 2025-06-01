@@ -3,12 +3,13 @@ package e_commerce.cart_service.controller;
 import e_commerce.cart_service.client.AuthServiceClient;
 import e_commerce.cart_service.dto.request.AddItemRequest;
 import e_commerce.cart_service.dto.request.RemoveItemRequest;
-import e_commerce.cart_service.dto.response.CheckoutResponse;
+import e_commerce.cart_service.exception.UnauthorizedException;
 import e_commerce.cart_service.model.Cart;
 import e_commerce.cart_service.service.CartService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException.Unauthorized;
 
 @RestController
 @RequestMapping("/cart")
@@ -23,7 +24,7 @@ public class CartController {
     @GetMapping
     public ResponseEntity<Cart> getCart(@RequestHeader("Authorization") String token) throws Exception {
         if (!authServiceClient.verifyToken(token)) {
-            throw new Exception("Invalid token");
+            throw new UnauthorizedException("Invalid token");
         }
         String userId = authServiceClient.getUserIdFromToken(token);
         Cart cart = cartService.getCart(userId);

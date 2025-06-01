@@ -3,7 +3,6 @@ package e_commerce.cart_service.service;
 // import e_commerce.cart_service.client.InventoryServiceClient;
 import e_commerce.cart_service.client.ProductServiceClient;
 import e_commerce.cart_service.dto.request.AddItemRequest;
-import e_commerce.cart_service.dto.request.RemoveItemRequest;
 import e_commerce.cart_service.repository.CartRepository;
 import e_commerce.cart_service.model.Cart;
 import e_commerce.cart_service.model.CartItem;
