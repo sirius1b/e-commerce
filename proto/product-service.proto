@@ -1,0 +1,107 @@
+
+syntax = "proto3";
+package auth;
+option java_package = "com.sirius1b.auth";
+option java_outer_classname = "AuthServiceProto";
+import "google/protobuf/timestamp.proto";
+
+service ProductService {
+    rpc GetProduct(GetProductRequest) returns (GetProductResponse);
+    rpc ListProducts(ListProductsRequest) returns (ListProductsResponse);
+    rpc CreateProduct(CreateProductRequest) returns (CreateProductResponse);
+    rpc UpdateProduct(UpdateProductRequest) returns (UpdateProductResponse);
+    rpc DeleteProduct(DeleteProductRequest) returns (DeleteProductResponse);
+}
+
+
+
+message error {
+  string message = 1;
+  string code = 2;
+}
+
+message Price {
+    double amount = 1;
+    double actual_amount = 2;
+    string currency = 3;
+}
+
+message Category {
+    string id = 1;
+    string name = 2;
+}
+
+message Image {
+    bytes url = 1;
+    string alt_text = 2;
+}
+
+message Product {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  repeated Image images = 4;
+  Price prices = 5;
+  Category Category = 6;
+  google.protobuf.Timestamp created_at = 5;
+  google.protobuf.Timestamp updated_at = 6;
+}
+
+
+
+message GetProductRequest {
+  string id = 1;
+}
+
+message GetProductResponse {
+  oneof {
+    Product product = 1;
+    error error = 2;
+  }
+}
+
+message ListProductsRequest {
+  optional string category_id = 1; // Optional filter by category ID
+  int32 page = 2;   // Page number for pagination   
+  int32 page_size = 3; // Number of products per page
+}
+
+message ListProductsResponse {
+  oneof {
+    repeated Product products = 1; // List of products
+    error error = 2; // Error message
+  }
+}
+
+message CreateProductRequest {
+  Product product = 1; // Product details to create
+}
+
+message CreateProductResponse {
+  oneof {
+    Product product = 1; // Created product details
+    error error = 2; // Error message
+  }
+}
+
+message UpdateProductRequest {
+  Product product = 1; // Product details to update
+}
+
+message UpdateProductResponse {
+  oneof {
+    Product product = 1; // Updated product details
+    error error = 2; // Error message
+  }
+}
+
+message DeleteProductRequest {
+  string id = 1; // ID of the product to delete
+}
+
+message DeleteProductResponse {
+  oneof {
+    string message = 1; // Success message
+    error error = 2; // Error message
+  }
+}
