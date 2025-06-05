@@ -1,0 +1,23 @@
+syntax = "proto3";
+package sirius1b;
+option java_package = "com.sirius1b.order";
+option java_outer_classname = "OrderServiceProto";
+import "google/protobuf/timestamp.proto";
+import "proto/common.proto";
+
+//
+//service OrderService {
+//  rpc Checkout(CheckoutRequest) returns (CheckoutResponse); // API for internal calls only by svc(s)
+//}
+//
+//
+//message CheckoutRequest {
+//  Cart cart = 2; // Cart details for the checkout
+//  Token token = 3; // User token for authentication
+//}
+//
+//message CheckoutResponse {
+//  string payment_id = 1; // Unique identifier for the payment
+//  PaymentStatus status = 2; // Status of the payment
+//  string
+//}

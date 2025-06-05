@@ -1,0 +1,37 @@
+syntax = "proto3";
+package sirius1b;
+option java_package = "com.sirius1b.cart";
+option java_outer_classname = "CartServiceProto";
+import "google/protobuf/timestamp.proto";
+
+import "proto/common.proto";
+
+service CartService {
+    rpc GetCart(GetCartRequest) returns (Cart);
+    rpc UpdateCart(UpdateCartRequest) returns (UpdateCartRequest);
+    rpc Checkout(CheckoutRequest) returns (CheckoutResponse);
+}
+
+message GetCartRequest {
+    Token token = 1; // User token for authentication
+}
+
+
+
+message UpdateCartRequest {
+    Token token = 1; // User token for authentication
+    Cart cart = 2; // Updated cart details
+    UpdateType update_type = 3; // Type of update (PATCH or REPLACE)
+}
+
+
+message CheckoutRequest {
+    Token token = 1; // User token for authentication
+}
+
+message CheckoutResponse {
+    oneof data {
+        string message = 1; // Success message
+        error error = 2; // Error message
+    }
+}

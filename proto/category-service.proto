@@ -1,0 +1,36 @@
+syntax = "proto3";
+package sirius1b;
+option java_package = "com.sirius1b.category";
+option java_outer_classname = "CategoryServiceProto";
+import "google/protobuf/timestamp.proto";
+import "proto/common.proto";
+
+
+service CategoryService {
+  rpc GetCategories(GetCategoryRequest) returns (CategoryResponse);
+  rpc CreateCategory(CategoryRequest) returns (CategoryResponse);
+  rpc UpdateCategory(CategoryRequest) returns (CategoryResponse);
+  rpc DeleteCategory(CategoryRequest) returns (CategoryResponse);
+}
+
+message GetCategoryRequest{
+  optional string id = 1; // Optional filter by category ID
+}
+
+
+message Categories {
+    repeated Category category = 1; // List of categories
+}
+
+message CategoryRequest {
+  Categories categories = 1; // Category details to create
+  Token token = 2; // Admin token
+}
+
+message CategoryResponse {
+  oneof data {
+    Categories categories = 1; // List of categories
+    error error = 2; // Error message
+  }
+}
+

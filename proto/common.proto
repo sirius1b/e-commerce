@@ -1,0 +1,84 @@
+syntax = "proto3";
+package sirius1b;
+option java_package = "com.sirius1b.common";
+option java_outer_classname = "CommonProto";
+import "google/protobuf/timestamp.proto";
+
+
+enum ERROR_CODE {
+  UNKNOWN_ERROR = 0;
+  INVALID_REQUEST = 1;
+  UNAUTHORIZED = 2;
+  FORBIDDEN = 3;
+  NOT_FOUND = 4;
+  CONFLICT = 5;
+  INTERNAL_SERVER_ERROR = 6;
+  STOCK_UNAVAILABLE = 7; // Specific error for stock unavailability
+}
+
+
+message error {
+  string message = 1;
+  ERROR_CODE code = 2;
+}
+
+message Price {
+    double amount = 1;
+    double actual_amount = 2;
+    string currency = 3;
+}
+
+message Category {
+    string id = 1;
+    string name = 2;
+}
+
+message Image {
+    bytes url = 1;
+    string alt_text = 2;
+}
+
+message Product {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  repeated Image images = 4;
+  Price prices = 5;
+  Category Category = 6;
+  google.protobuf.Timestamp created_at = 7;
+  google.protobuf.Timestamp updated_at = 8;
+}
+
+
+message Token {
+  string value = 1;
+  optional google.protobuf.Timestamp expires_at = 2;
+}
+
+enum PaymentStatus {
+  PAYMENT_STATUS_PENDING = 0; // Payment is pending
+  PAYMENT_STATUS_COMPLETED = 1; // Payment has been completed successfully
+  PAYMENT_STATUS_FAILED = 2; // Payment has failed
+}
+
+message Payment{
+  PaymentStatus status = 1; // Status of the payment
+}
+
+message Cart {
+  string user_id = 1; // User ID associated with the cart
+  string cart_id = 2; // Unique cart ID
+  repeated CartItem items = 3; // List of items in the cart
+  Price total_price = 4; // Total price of the cart
+}
+
+message CartItem {
+  string product_id = 1; // Product ID
+  int32 quantity = 2; // Quantity of the product
+  Price price = 3; // Price of the product
+}
+
+enum UpdateType {
+  PATCH = 0; // Partial update
+  REPLACE = 1; // Full replacement
+}

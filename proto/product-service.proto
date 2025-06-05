@@ -1,12 +1,13 @@
 
 syntax = "proto3";
-package auth;
-option java_package = "com.sirius1b.auth";
-option java_outer_classname = "AuthServiceProto";
+package sirius1b;
+option java_package = "com.sirius1b.product";
+option java_outer_classname = "ProductServiceProto";
 import "google/protobuf/timestamp.proto";
+import "proto/common.proto";
 
 service ProductService {
-    rpc GetProduct(GetProductRequest) returns (GetProductResponse);
+    rpc GetProduct(GetProductsRequest) returns (GetProductResponse);
     rpc ListProducts(ListProductsRequest) returns (ListProductsResponse);
     rpc CreateProduct(CreateProductRequest) returns (CreateProductResponse);
     rpc UpdateProduct(UpdateProductRequest) returns (UpdateProductResponse);
@@ -14,47 +15,12 @@ service ProductService {
 }
 
 
-
-message error {
-  string message = 1;
-  string code = 2;
-}
-
-message Price {
-    double amount = 1;
-    double actual_amount = 2;
-    string currency = 3;
-}
-
-message Category {
-    string id = 1;
-    string name = 2;
-}
-
-message Image {
-    bytes url = 1;
-    string alt_text = 2;
-}
-
-message Product {
-  string id = 1;
-  string name = 2;
-  string description = 3;
-  repeated Image images = 4;
-  Price prices = 5;
-  Category Category = 6;
-  google.protobuf.Timestamp created_at = 5;
-  google.protobuf.Timestamp updated_at = 6;
-}
-
-
-
-message GetProductRequest {
+message GetProductsRequest {
   string id = 1;
 }
 
 message GetProductResponse {
-  oneof {
+  oneof data{
     Product product = 1;
     error error = 2;
   }
@@ -67,18 +33,23 @@ message ListProductsRequest {
 }
 
 message ListProductsResponse {
-  oneof {
-    repeated Product products = 1; // List of products
+  oneof data{
+    Products products = 1; // List of products
     error error = 2; // Error message
   }
 }
 
+message Products {
+  repeated Product product = 1;
+}
+
 message CreateProductRequest {
   Product product = 1; // Product details to create
+  Token token = 2; // Admin token
 }
 
 message CreateProductResponse {
-  oneof {
+  oneof data{
     Product product = 1; // Created product details
     error error = 2; // Error message
   }
@@ -86,10 +57,11 @@ message CreateProductResponse {
 
 message UpdateProductRequest {
   Product product = 1; // Product details to update
+  Token token = 2; // Admin token
 }
 
 message UpdateProductResponse {
-  oneof {
+  oneof data{
     Product product = 1; // Updated product details
     error error = 2; // Error message
   }
@@ -97,10 +69,11 @@ message UpdateProductResponse {
 
 message DeleteProductRequest {
   string id = 1; // ID of the product to delete
+  Token token = 2; // Admin token
 }
 
 message DeleteProductResponse {
-  oneof {
+  oneof data {
     string message = 1; // Success message
     error error = 2; // Error message
   }

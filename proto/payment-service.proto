@@ -1,0 +1,24 @@
+syntax = "proto3";
+package sirius1b;
+option java_package = "com.sirius1b.payment";
+option java_outer_classname = "PaymentServiceProto";
+import "google/protobuf/timestamp.proto";
+import "proto/common.proto";
+
+service PaymentService {
+  rpc ProcessPayment(PaymentRequest) returns (PaymentResponse);
+}
+
+message PaymentRequest {
+  string payment_id = 1 ; // Unique identifier for the payment
+}
+
+
+message PaymentResponse {
+  oneof data {
+    Payment payment = 1; // Payment details if successful
+    error error = 2; // Error message if payment processing failed
+  }
+}
+
+

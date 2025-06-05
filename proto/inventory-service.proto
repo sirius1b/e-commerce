@@ -1,0 +1,36 @@
+syntax = "proto3";
+package sirius1b;
+option java_package = "com.sirius1b.inventory";
+option java_outer_classname = "InventoryServiceProto";
+import "google/protobuf/timestamp.proto";
+import "proto/common.proto";
+
+
+service InventoryService {
+  rpc LockStock(StockRequest) returns (StockResponse); // api for internal calls only by svc(s)
+  rpc UnlockStock(StockRequest) returns (StockResponse); // api for internal calls only by svc(s)
+  rpc GetStock(GetStockRequest) returns (StockResponse); // api for internal calls only by svc(s)
+  rpc UpdateStock(UpdateStockRequest) returns (StockResponse); // api for admin user to update stock
+}
+
+message StockRequest {
+  string product_id = 1; // Product ID to lock stock for
+  int32 quantity = 2; // Quantity to lock
+}
+
+message StockResponse {
+  oneof data {
+    bool success = 1; // Indicates if the stock was successfully locked
+    error error = 2; // Error message if locking failed
+  }
+}
+
+message GetStockRequest {
+  string product_id = 1; // Product ID to get stock for
+}
+
+message UpdateStockRequest {
+  string product_id = 1; // Product ID to update stock for
+  int32 quantity = 2; // New stock quantity
+  Token token = 3; // Admin token for authentication
+}
