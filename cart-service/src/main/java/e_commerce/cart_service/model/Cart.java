@@ -20,11 +20,11 @@ public class Cart implements Serializable {
     @Column(name = "cart_id")
     private String cartId;
 
-    @Column(name = "user_id", unique = true, nullable = false)
+    @Column(name = "user_id", nullable = false)
     private String userId;
 
     @Column(name = "total", nullable = false)
-    private long total;
+    private double total;
 
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CartItem> items = new ArrayList<>();
@@ -56,11 +56,11 @@ public class Cart implements Serializable {
         this.userId = userId;
     }
 
-    public long getTotal() {
+    public double getTotal() {
         return total;
     }
 
-    public void setTotal(long total) {
+    public void setTotal(double total) {
         this.total = total;
     }
 
@@ -82,7 +82,7 @@ public class Cart implements Serializable {
 
     public void recalculateTotal() {
         this.total = items.stream()
-            .mapToLong(item -> item.getPrice() * item.getQuantity())
+            .mapToDouble(item -> item.getPrice() * item.getQuantity())
             .sum();
     }
 
@@ -101,5 +101,16 @@ public class Cart implements Serializable {
     public void removeItem(String skuId) {
         items.removeIf(item -> item.getSkuId().equals(skuId));
         recalculateTotal();
+    }
+
+    @Override
+    public String toString() {
+        return "Cart{" +
+                "cartId='" + cartId + '\'' +
+                ", userId='" + userId + '\'' +
+                ", total=" + total +
+                ", items=" + items +
+                ", status='" + status + '\'' +
+                '}';
     }
 }

@@ -4,6 +4,7 @@ package e_commerce.cart_service.service;
 import e_commerce.cart_service.client.ProductServiceClient;
 import e_commerce.cart_service.dto.request.AddItemRequest;
 import e_commerce.cart_service.repository.CartRepository;
+import lombok.extern.slf4j.Slf4j;
 import e_commerce.cart_service.model.Cart;
 import e_commerce.cart_service.model.CartItem;
 import e_commerce.cart_service.model.ProductInfo;
@@ -13,7 +14,7 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+@Slf4j
 @Service
 public class CartService {
 
@@ -38,41 +39,46 @@ public class CartService {
     public Cart addItemToCart(String userId, AddItemRequest request) throws Exception {
         // Get product info from Product Service
         ProductInfo productInfo = productServiceClient.getProductInfo(request.getSkuId());
-    
+        log.info("Product info retrieved: {}", productInfo.toString());
+
         // Check if the user has an active cart
         Cart cart = cartRepository.findByUserIdAndStatus(userId, "ACTIVE");
         if (cart == null) {
             // Create a new cart if no active cart exists
+            log.info("Creating a new cart for user: {}", userId);
             cart = new Cart();
             cart.setCartId(UUID.randomUUID().toString());
             cart.setUserId(userId);
             cart.setStatus("ACTIVE");
             cart.setTotal(0);
-            cartRepository.save(cart);
+            // cart = cartRepository.save(cart);
+            // log.info("New cart created: {}", cart.toString());
         }
-    
+
+        // Extract price (assuming you want the first currency's price)
+        double price = 0;
+        if (productInfo.getMultipleCurrencies() != null && !productInfo.getMultipleCurrencies().isEmpty()) {
+            price = (long) productInfo.getMultipleCurrencies().get(0).getPrice();
+        } else {
+            throw new Exception("Product price information is missing");
+        }
+
         // Create cart item
         CartItem cartItem = new CartItem(
-            productInfo.getSkuId(),
+            request.getSkuId(), // skuId
             productInfo.getName(),
-            productInfo.getPrice(),
+            price,
             request.getQuantity()
         );
-    
-        // Check if stock is available with Inventory Service
-        // Uncomment the following lines if you have an InventoryServiceClient implemented
+        cartItem.setCart(cart); //Set the cart reference into cart item
         
-        // boolean isStockAvailable = inventoryServiceClient.checkStock(request.getSkuId(), request.getQuantity());
-        // if (!isStockAvailable) {
-        //     throw new Exception("Insufficient stock for item: " + request.getSkuId());
-        // }
+        log.info("Added item to cart: {}", cartItem.toString());
 
-    
         // Add item to cart
         cart.addItem(cartItem);
-        cartRepository.save(cart);
-    
-        return cart;
+        Cart updatedCart = cartRepository.save(cart);
+        log.info("Item added to cart. Updated cart: {}", updatedCart);
+        return updatedCart;
     }
 
     public Cart removeItemFromCart(String userId, String skuId) throws Exception {
@@ -86,12 +92,21 @@ public class CartService {
     }
 
     public String checkoutCart(String userId) throws Exception {
-        Cart cart = getCart(userId);
-    
-        // Perform checkout logic (e.g., payment processing, inventory update)
-        cart.setStatus("INACTIVE"); // Mark the cart as inactive
-        cartRepository.save(cart); // Save the updated cart
-    
+        // Cart cart = getCart(userId);
+        Cart cart = cartRepository.findByUserIdAndStatus(userId, "ACTIVE");
+        if (cart == null || cart.getItems().isEmpty()) {
+            throw new Exception("Cart is empty or does not exist.");
+        }
+
+        log.info("Checking out cart for user: {}", userId);
+        
+        //  Call Inventory Service to reserve/deduct stock
+        //  Call Payment Service to process payment
+        //  Call Order Service to create order
+
+        cart.setStatus("INACTIVE");
+        cartRepository.save(cart);
+
         return "Checkout successful for user: " + userId;
     }
 }

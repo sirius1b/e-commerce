@@ -3,6 +3,8 @@ package e_commerce.cart_service.model;
 import jakarta.persistence.*;
 import java.io.Serializable;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name = "CartItem")
 public class CartItem implements Serializable {
@@ -12,8 +14,9 @@ public class CartItem implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cart_id", nullable = false)
+    @JsonIgnore
     private Cart cart;
 
     @Column(name = "sku_id", nullable = false)
@@ -23,14 +26,14 @@ public class CartItem implements Serializable {
     private String name;
 
     @Column(name = "price", nullable = false)
-    private long price;
+    private double price;
 
     @Column(name = "quantity", nullable = false)
     private int quantity;
 
     public CartItem() {}
 
-    public CartItem(String skuId, String name, long price, int quantity) {
+    public CartItem(String skuId, String name, double price, int quantity) {
         this.skuId = skuId;
         this.name = name;
         this.price = price;
@@ -69,7 +72,7 @@ public class CartItem implements Serializable {
         this.name = name;
     }
 
-    public long getPrice() {
+    public double getPrice() {
         return price;
     }
 
@@ -83,5 +86,16 @@ public class CartItem implements Serializable {
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
+    }
+
+    @Override
+    public String toString() {
+        return "CartItem{" +
+                "id=" + id +
+                ", skuId='" + skuId + '\'' +
+                ", name='" + name + '\'' +
+                ", price=" + price +
+                ", quantity=" + quantity +
+                '}';
     }
 }
